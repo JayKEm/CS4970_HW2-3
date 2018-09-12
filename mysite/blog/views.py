@@ -1,6 +1,7 @@
 from django.shortcuts import render
 from  .forms import PostModelForm
 from django.http import HttpResponse
+from django.shortcuts import get_object_or_404
 
 from .models import PostModel
 # Create your views here.
@@ -27,3 +28,34 @@ def post_model_create_view(request):
             "form": PostModelForm()
         }
     return render(request, template, context)
+
+def post_model_detail_view(request, id=None):
+    obj = get_object_or_404(PostModel, id=id)
+    context = {
+        "object": obj,
+    }
+    template = "blog/detail-view.html"
+    return render(request, template, context)
+
+def post_model_update_view(request, id=None):
+    obj = get_object_or_404(PostModel, id=id)
+    template = "blog/update-view.html"
+    form = PostModelForm(request.POST or None, instance=obj)
+    context = {
+        "form": form
+    }
+    if form.is_valid():
+        form.save()
+        context = {
+            "form": PostModelForm()
+        }
+    return render(request, template, context)
+
+def post_model_delete_view(request, id=None):
+    template = "blog/delete-view.html"
+    if request.method == 'POST':
+        obj = get_object_or_404(PostModel, id=id)
+        obj.delete()
+
+    
+    return render(request, template)
